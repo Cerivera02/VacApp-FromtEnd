@@ -127,7 +127,7 @@ export const EditEnfermedadModal = ({
         showNotification("La enfermedad no tiene un ID válido", "error");
         return;
       } else {
-        const response = await EnfermedadesService.updateEnfermedad(
+        await EnfermedadesService.updateEnfermedad(
           enfermedadActualizada.id,
           enfermedadActualizada
         );

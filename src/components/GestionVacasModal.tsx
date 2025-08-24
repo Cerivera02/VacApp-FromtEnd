@@ -170,7 +170,7 @@ export const GestionVacasModal = ({
     }
   }, [vacaId]);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
@@ -930,7 +930,7 @@ export const GestionDetallesModal = ({
     loadEnfermedadesYVacunas();
   }, []);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
