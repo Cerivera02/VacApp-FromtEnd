@@ -164,7 +164,7 @@ export const VacaCard = ({
     navigate(`/vaca/${vaca.id}/detalles`);
   };
 
-  const handleEditVaca = (id: number) => {
+  const handleEditVaca = () => {
     // Abrir modal de edición directamente
     openModal({
       id: "edit-vaca",
@@ -301,7 +301,7 @@ export const VacaCard = ({
               size="small"
               variant="outlined"
               color="primary"
-              onClick={() => handleEditVaca(vaca.id)}
+              onClick={() => handleEditVaca()}
             >
               Editar
             </Button>
