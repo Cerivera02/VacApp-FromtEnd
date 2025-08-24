@@ -1,6 +1,7 @@
 import type { HttpMethod } from "../types/interfaces";
 import { storage } from "./storage";
 import { AuthService } from "./authService";
+import { config } from "../config/env";
 
 class Connection {
   private baseUrl: string;
@@ -99,4 +100,4 @@ class Connection {
   }
 }
 
-export const conn = new Connection("http://localhost:5000");
+export const conn = new Connection(config.apiUrl);
