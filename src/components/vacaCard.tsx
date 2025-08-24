@@ -165,8 +165,6 @@ export const VacaCard = ({
   };
 
   const handleEditVaca = (id: number) => {
-    console.log("✏️ handleEditVaca llamado desde vacaCard para vaca:", id);
-
     // Abrir modal de edición directamente
     openModal({
       id: "edit-vaca",
@@ -175,9 +173,6 @@ export const VacaCard = ({
         <EditVacaModal
           vaca={vaca}
           onVacaUpdated={(vacaActualizada) => {
-            console.log(
-              "🔄 Vaca actualizada en modal, notificando al componente padre"
-            );
             // Llamar a la función del componente padre si existe
             if (onVacaUpdated) {
               onVacaUpdated(vacaActualizada);
@@ -188,7 +183,6 @@ export const VacaCard = ({
       maxWidth: "md",
       fullWidth: true,
     });
-    console.log("✏️ Modal de edición abierto desde vacaCard");
   };
 
   return (

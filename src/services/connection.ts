@@ -54,7 +54,14 @@ class Connection {
       if (response.status === 401) {
         this.clearToken();
       }
-      const errorData = await response.json().catch(() => ({}));
+
+      // Para errores 404, intentar obtener el mensaje del body
+      let errorData: { message?: string; error?: string } = {};
+      try {
+        errorData = await response.json();
+      } catch {
+        // Si no se puede parsear el JSON, usar un objeto vacío
+      }
 
       // Si es token inválido y no hemos reintentado aún, renovar token y reintentar
       if (errorData.message === "Token inválido" && retryCount === 0) {
@@ -78,7 +85,13 @@ class Connection {
         }
       }
 
-      throw new Error(errorData.message || `Error ${response.status}`);
+      // Crear un error más informativo
+      const errorMessage =
+        errorData.message || errorData.error || `Error ${response.status}`;
+      const error = new Error(errorMessage);
+      (error as any).status = response.status;
+      (error as any).response = response;
+      throw error;
     }
     return response.json();
   }

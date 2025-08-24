@@ -168,7 +168,6 @@ export const VacaDetallesPage = () => {
   }
 
   const handleEditEnfermedad = (enfermedad: Enfermedad) => {
-    console.log("Editar enfermedad:", enfermedad);
     openModal({
       id: "edit-enfermedad",
       title: "Editar Enfermedad",
@@ -176,7 +175,6 @@ export const VacaDetallesPage = () => {
         <EditEnfermedadModal
           enfermedad={enfermedad}
           onEnfermedadUpdated={(enfermedadActualizada: Enfermedad) => {
-            console.log("Enfermedad actualizada:", enfermedadActualizada);
             // Actualizar la enfermedad en el estado local
             setEnfermedades((prev) =>
               prev.map((e) =>
@@ -213,7 +211,6 @@ export const VacaDetallesPage = () => {
   };
 
   const handleEditVacuna = (vacuna: Vacuna) => {
-    console.log("Editar vacuna:", vacuna);
     openModal({
       id: "edit-vacuna",
       title: "Editar Vacuna",
@@ -221,7 +218,6 @@ export const VacaDetallesPage = () => {
         <EditVacunaModal
           vacuna={vacuna}
           onVacunaUpdated={(vacunaActualizada: Vacuna) => {
-            console.log("Vacuna actualizada:", vacunaActualizada);
             // Actualizar la vacuna en el estado local
             setVacunas((prev) =>
               prev.map((v) =>
@@ -255,18 +251,11 @@ export const VacaDetallesPage = () => {
   };
 
   const handleRefreshVacaData = () => {
-    console.log(
-      "🔄 Recargando datos de la vaca después del registro en historial"
-    );
     loadVacaData(true); // Forzar recarga desde API
   };
 
   const handleOpenGestionModal = () => {
-    console.log("🔍 handleOpenGestionModal llamado");
-    console.log("🔍 ID de la vaca:", id);
-
     if (id) {
-      console.log("🔍 Abriendo modal con ID:", parseInt(id));
       openModal({
         id: "gestion-detalles",
         title: "Gestión de Enfermedades y Vacunas",
@@ -279,26 +268,17 @@ export const VacaDetallesPage = () => {
         maxWidth: "md",
         fullWidth: true,
       });
-      console.log("🔍 Modal abierto");
-    } else {
-      console.log("❌ No hay ID de vaca disponible");
     }
   };
 
   const handleVacaUpdated = (vacaActualizada: Vaca) => {
-    console.log("🔄 Vaca actualizada:", vacaActualizada);
     setVaca(vacaActualizada);
 
-    // Recargar todos los datos de la vaca (enfermedades, vacunas, propietario)
-    console.log("🔄 Recargando datos completos después de editar vaca");
-    loadVacaData(true); // Forzar recarga desde API
+    loadVacaData(true);
   };
 
   const handleOpenEditModal = () => {
-    console.log("✏️ handleOpenEditModal llamado");
-
     if (vaca) {
-      console.log("✏️ Abriendo modal de edición para vaca:", vaca.id);
       openModal({
         id: "edit-vaca",
         title: "Editar Información General",
@@ -308,9 +288,6 @@ export const VacaDetallesPage = () => {
         maxWidth: "md",
         fullWidth: true,
       });
-      console.log("✏️ Modal de edición abierto");
-    } else {
-      console.log("❌ No hay datos de vaca disponibles");
     }
   };
 

@@ -52,7 +52,6 @@ export const EditVacaModal = ({ vaca, onVacaUpdated }: EditVacaModalProps) => {
         const marcasDelContexto = getAllMarcaData();
         setMarcas(marcasDelContexto);
       } catch (error) {
-        console.error("Error cargando marcas:", error);
         setMarcas([]);
       }
     };
@@ -102,8 +101,6 @@ export const EditVacaModal = ({ vaca, onVacaUpdated }: EditVacaModalProps) => {
           : undefined,
         descripcion: emptyToUndefined(editFormData.descripcion),
       };
-
-      console.log("Datos a enviar:", updatedVacaData);
 
       const vacaActualizada = await VacaService.updateVaca(
         vaca.id,

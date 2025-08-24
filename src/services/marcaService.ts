@@ -7,7 +7,6 @@ export const MarcaService = {
       const response = await conn.get<Marca[]>("/marca");
       return response;
     } catch (error) {
-      console.error("Error obteniendo marcas:", error);
       throw error;
     }
   },
@@ -17,7 +16,6 @@ export const MarcaService = {
       const response = await conn.get<Marca>(`/marca/${id}`);
       return response;
     } catch (error) {
-      console.error(`Error obteniendo marca ${id}:`, error);
       throw error;
     }
   },
