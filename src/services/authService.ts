@@ -23,8 +23,6 @@ export const AuthService = {
 
       try {
         const marcas = await MarcaService.getTodasLasMarcas();
-        console.log("marcas", marcas);
-        console.log("userData", userData);
 
         if (marcas.length > 0) {
           let marcaUsuario = marcas.find(

@@ -81,7 +81,6 @@ export const GestionVacasModal = ({
         const marcasDelContexto = getAllMarcaData();
         setMarcas(marcasDelContexto);
       } catch (error) {
-        console.error("Error cargando marcas:", error);
         setMarcas([]);
       }
     };

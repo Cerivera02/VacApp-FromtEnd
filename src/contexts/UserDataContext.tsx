@@ -62,7 +62,6 @@ export const UserDataProvider = ({ children }: UserDataProviderProps) => {
         setUser(normalizedUser);
       }
     } catch (error) {
-      console.error("Error al cargar datos del usuario:", error);
     } finally {
       setIsLoading(false);
     }

@@ -7,7 +7,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { Navbar } from "../components/navbar";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { VacaService } from "../services/vacaService";
 import { MarcaService } from "../services/marcaService";
 import type { Vaca } from "../types/interfaces";
@@ -22,12 +22,10 @@ import { ModalRenderer } from "../components/ModalRenderer";
 export default function Dashboard() {
   const { showNotification } = useNotification();
   const {
-    getVacaData,
     clearVacaData,
     setMarcaData,
     clearAllMarcaData,
     setVacaData: setVacaDataContext,
-    getAllMarcaData,
   } = useVacaData();
   const { openModal } = useModal();
   const [vacaData, setVacaData] = useState<Vaca[]>([]);
@@ -36,13 +34,18 @@ export default function Dashboard() {
   const [lastApiFetch, setLastApiFetch] = useState<number | null>(null);
   const [currentTime, setCurrentTime] = useState(Date.now());
 
+  // Ref para controlar si ya se hizo la carga inicial
+  const hasInitialized = useRef(false);
+
   // Actualizar el tiempo cada segundo para que el "última actualización" sea dinámico
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now());
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   const getVaca = useCallback(async () => {
@@ -70,80 +73,64 @@ export default function Dashboard() {
     }
   }, [showNotification, setMarcaData]);
 
+  // Carga inicial de datos - solo se ejecuta una vez
   useEffect(() => {
-    // Primero intentar recuperar datos del contexto
-    if (vacaData.length === 0 && lastFetch === null) {
-      const contextData = Array.from({ length: 100 }, (_, i) => {
-        const data = getVacaData(i + 1);
-        return data;
-      }).filter(Boolean);
-
-      // También recuperar las marcas del contexto
-      const contextMarcas = getAllMarcaData();
-
-      if (contextData.length > 0) {
-        // Si hay datos en el contexto, usarlos
-        const vacas = contextData.map((data) => data!.vaca);
-        setVacaData(vacas as Vaca[]);
-
-        // Usar el timestamp de la API del contexto si está disponible
-        const apiTimestamp = contextData.find(
-          (data) => data?.apiTimestamp
-        )?.apiTimestamp;
-
-        if (apiTimestamp) {
-          setLastApiFetch(apiTimestamp);
-          setLastFetch(apiTimestamp); // Usar el timestamp original, no el actual
-        } else {
-          setLastFetch(Date.now()); // Solo si no hay apiTimestamp
-        }
-
-        setLoading(false);
-      } else if (contextMarcas.length > 0) {
-        // Si solo hay marcas en el contexto, cargar solo las vacas desde la API
-        // pero mantener las marcas del contexto
-        VacaService.getVaca()
-          .then((vacas) => {
-            setVacaData(vacas);
-            setLastFetch(Date.now());
-            setLastApiFetch(Date.now());
-            setLoading(false);
-          })
-          .catch((error: any) => {
-            showNotification(error.message, "error");
-            setLoading(false);
-          });
-      } else {
-        // Si no hay datos en el contexto, cargar desde la API
-        getVaca();
-      }
-    } else {
-      setLoading(false);
+    // Solo ejecutar si no se ha inicializado
+    if (hasInitialized.current) {
+      return;
     }
-  }, [
-    getVaca,
-    vacaData.length,
-    lastFetch,
-    getVacaData,
-    getAllMarcaData,
-    showNotification,
-  ]);
+
+    const loadInitialData = async () => {
+      try {
+        setLoading(true);
+
+        // Cargar todo desde la API directamente (más simple y confiable)
+        const [vacas, marcas] = await Promise.all([
+          VacaService.getVaca(),
+          MarcaService.getTodasLasMarcas(),
+        ]);
+
+        // Almacenar marcas en el contexto
+        marcas.forEach((marca) => {
+          setMarcaData(marca);
+        });
+
+        // Actualizar estado
+        setVacaData(vacas);
+        setLastFetch(Date.now());
+        setLastApiFetch(Date.now());
+      } catch (error: any) {
+        showNotification("Error al cargar datos iniciales", "error");
+      } finally {
+        setLoading(false);
+        hasInitialized.current = true;
+      }
+    };
+
+    loadInitialData();
+  }, []); // Sin dependencias - solo se ejecuta una vez
 
   const handleRefresh = () => {
-    // Limpiar el contexto para forzar recarga completa
+    // Solo permitir refresh si no está cargando
+    if (loading) return;
 
-    // Limpiar todas las vacas del contexto
+    // Limpiar el contexto para forzar recarga completa
     vacaData.forEach((vaca) => {
       clearVacaData(vaca.id);
     });
 
-    // Limpiar todas las marcas del contexto
     clearAllMarcaData();
 
+    // Resetear estados
     setVacaData([]);
     setLastFetch(null);
     setLastApiFetch(null);
+    setLoading(true);
 
+    // Marcar como no inicializado para permitir recarga
+    hasInitialized.current = false;
+
+    // Cargar datos frescos
     getVaca();
   };
 
@@ -159,8 +146,6 @@ export default function Dashboard() {
               setVacaData((prev) => [...prev, vacaCreada]);
 
               // Guardar la vaca en el contexto para que esté disponible en otras páginas
-              // Nota: setVacaData del contexto requiere enfermedades, propietario y vacunas
-              // Por ahora solo guardamos la vaca básica
               setVacaDataContext(
                 vacaCreada,
                 [],
@@ -173,12 +158,9 @@ export default function Dashboard() {
               setLastFetch(Date.now());
               setLastApiFetch(Date.now());
 
-              // Refrescar los datos del backend para asegurar sincronización completa
-              await getVaca();
+              showNotification("Vaca creada exitosamente", "success");
             } catch (error) {
-              console.error("Error al procesar la vaca creada:", error);
-              // Si falla el procesamiento, refrescar para mostrar estado real
-              await getVaca();
+              showNotification("Error al procesar la vaca creada", "error");
             }
           }}
         />
@@ -192,8 +174,6 @@ export default function Dashboard() {
   };
 
   const handleVacaUpdated = async (vacaActualizada: Vaca) => {
-    console.log("🔄 Vaca actualizada en Dashboard:", vacaActualizada);
-
     try {
       // Actualizar la vaca en el estado local
       setVacaData((prev) =>
@@ -209,15 +189,9 @@ export default function Dashboard() {
       setLastFetch(Date.now());
       setLastApiFetch(Date.now());
 
-      // Refrescar los datos del backend para asegurar sincronización completa
-      await getVaca();
-
       showNotification("Vaca actualizada correctamente", "success");
     } catch (error: any) {
-      console.error("Error al procesar la vaca actualizada:", error);
       showNotification("Error al actualizar la vaca", "error");
-      // Si falla el procesamiento, refrescar para mostrar estado real
-      await getVaca();
     }
   };
 
@@ -281,6 +255,23 @@ export default function Dashboard() {
         {loading ? (
           <Box sx={{ textAlign: "center", py: 4 }}>
             <div>Cargando vacas...</div>
+          </Box>
+        ) : vacaData.length === 0 ? (
+          <Box sx={{ textAlign: "center", py: 8 }}>
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              No hay vacas registradas
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Comienza agregando tu primera vaca usando el botón de abajo
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddVaca}
+              size="large"
+            >
+              Agregar Primera Vaca
+            </Button>
           </Box>
         ) : (
           <Box

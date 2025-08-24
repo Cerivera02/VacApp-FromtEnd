@@ -61,7 +61,6 @@ export const VacunasService = {
 
   async updateVacuna(vacunaId: number, data: Vacuna): Promise<void> {
     try {
-      console.log("data", data);
       await conn.put(`/vacasVacunas/${vacunaId}`, data);
     } catch (error) {
       throw error;

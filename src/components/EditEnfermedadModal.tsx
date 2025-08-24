@@ -34,11 +34,6 @@ export const EditEnfermedadModal = ({
   const { hasPermission } = useUserData();
   const [enfermedades, setEnfermedades] = useState<EnfermedadMaestra[]>([]);
 
-  console.log(
-    "🚀 EditEnfermedadModal - Estado inicial de enfermedad:",
-    enfermedad.estado
-  );
-
   const [editFormData, setEditFormData] = useState({
     enfermedad_id: enfermedad.enfermedad_id.toString(),
     estado:
@@ -50,8 +45,6 @@ export const EditEnfermedadModal = ({
       : "",
     observaciones: enfermedad.observaciones || "",
   });
-
-  console.log("📝 Estado inicial de editFormData:", editFormData);
 
   // Cargar enfermedades disponibles
   useEffect(() => {
@@ -72,9 +65,7 @@ export const EditEnfermedadModal = ({
 
   // Validar y corregir el estado si es inválido
   useEffect(() => {
-    console.log("🔍 Estado actual:", editFormData.estado);
     if (!editFormData.estado || editFormData.estado.trim() === "") {
-      console.log("⚠️ Estado inválido detectado, estableciendo como 'Activa'");
       setEditFormData((prev) => ({
         ...prev,
         estado: "Activa",
@@ -83,12 +74,8 @@ export const EditEnfermedadModal = ({
   }, [editFormData.estado]);
 
   const handleEditChange = (field: string, value: string) => {
-    console.log(`🔄 Cambiando campo '${field}' a valor: '${value}'`);
-
     const newValue =
       field === "estado" && (!value || value.trim() === "") ? "Activa" : value;
-
-    console.log(`✅ Nuevo valor para '${field}': '${newValue}'`);
 
     setEditFormData((prev) => ({
       ...prev,
@@ -120,8 +107,6 @@ export const EditEnfermedadModal = ({
           : undefined,
         observaciones: editFormData.observaciones || undefined,
       };
-
-      console.log(enfermedadActualizada);
 
       if (!enfermedadActualizada.id) {
         showNotification("La enfermedad no tiene un ID válido", "error");

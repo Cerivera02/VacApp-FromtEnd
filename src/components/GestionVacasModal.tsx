@@ -113,7 +113,6 @@ export const GestionVacasModal = ({
         const marcasDelContexto = getAllMarcaData();
         setMarcas(marcasDelContexto);
       } catch (error) {
-        console.error("Error cargando marcas:", error);
         setMarcas([]);
       }
     };
@@ -132,7 +131,6 @@ export const GestionVacasModal = ({
         setEnfermedades(enfermedadesData);
         setVacunas(vacunasData);
       } catch (error) {
-        console.error("Error cargando enfermedades y vacunas:", error);
         setEnfermedades([]);
         setVacunas([]);
       }
@@ -155,7 +153,6 @@ export const GestionVacasModal = ({
         }
         setVacas(vacasDelContexto);
       } catch (error) {
-        console.error("Error cargando vacas:", error);
         setVacas([]);
       }
     };
@@ -921,7 +918,6 @@ export const GestionDetallesModal = ({
         setEnfermedades(enfermedadesData);
         setVacunas(vacunasData);
       } catch (error) {
-        console.error("Error cargando enfermedades y vacunas:", error);
         setEnfermedades([]);
         setVacunas([]);
       }

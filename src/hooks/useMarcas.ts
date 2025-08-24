@@ -20,7 +20,6 @@ export const useMarcas = () => {
         setMarcaData(marca);
         return marca;
       } catch (error) {
-        console.error(`Error obteniendo marca ${id}:`, error);
         return null;
       }
     },

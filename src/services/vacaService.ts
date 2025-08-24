@@ -3,8 +3,19 @@ import type { Vaca } from "../types/interfaces";
 
 export const VacaService = {
   async getVaca(): Promise<Vaca[]> {
-    const response = await conn.get<Vaca[]>(`/vacas/`);
-    return response;
+    try {
+      const response = await conn.get<Vaca[]>(`/vacas/`);
+      return response;
+    } catch (error: any) {
+      // Si el error es 404 (no se encontraron vacas), retornar array vacío
+      if (
+        error.message?.includes("404") ||
+        error.message?.includes("No se encontraron vacas")
+      ) {
+        return [];
+      }
+      throw error;
+    }
   },
 
   async getVacaById(id: number): Promise<Vaca> {
